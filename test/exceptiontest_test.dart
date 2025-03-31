@@ -85,19 +85,17 @@ typedef ImportPrivateKeyFn<PrivateKey> =
     Future<PrivateKey> Function(List<int> keyData, Map<String, dynamic> params);
 typedef ImportPublicKeyFn<PublicKey> =
     Future<PublicKey> Function(List<int> keyData, Map<String, dynamic> params);
-typedef SignFn<PrivateKey> =
-    Future<List<int>> Function(
-      PrivateKey key,
-      List<int> data,
-      Map<String, dynamic> params,
-    );
-typedef VerifyFn<PublicKey> =
-    Future<bool> Function(
-      PublicKey key,
-      List<int> signature,
-      List<int> data,
-      Map<String, dynamic> params,
-    );
+typedef SignFn<PrivateKey> = Future<List<int>> Function(
+  PrivateKey key,
+  List<int> data,
+  Map<String, dynamic> params,
+);
+typedef VerifyFn<PublicKey> = Future<bool> Function(
+  PublicKey key,
+  List<int> signature,
+  List<int> data,
+  Map<String, dynamic> params,
+);
 
 /// Helper to expect exceptions or completion with timeout handling
 Future<void> expectThrowsOrCompletes<T>(
@@ -182,8 +180,7 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
 
   void _validateTestCase(CryptoTestCase c) {
     print('Validating test case: "${c.name}"');
-    final hasKey =
-        c.generateKeyParams != null ||
+    final hasKey = c.generateKeyParams != null ||
         c.privateKeyData != null ||
         c.privateJsonWebKeyData != null ||
         c.publicKeyData != null ||
@@ -199,7 +196,8 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
         c.importKeyParams != null,
         'Test case "${c.name}" requires importKeyParams for key import',
       );
-      print('Test case "${c.name}" has import key data, importKeyParams verified.');
+      print(
+          'Test case "${c.name}" has import key data, importKeyParams verified.');
     }
 
     if (c.signature != null || sign != null) {
@@ -211,7 +209,8 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
         c.plaintext != null,
         'Test case "${c.name}" requires plaintext for signing/verifying',
       );
-      print('Test case "${c.name}" has signing/verifying data, parameters verified.');
+      print(
+          'Test case "${c.name}" has signing/verifying data, parameters verified.');
     }
   }
 
@@ -254,8 +253,8 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
                         : Duration(seconds: 5),
                 allowTimeout:
                     (testCase.generateKeyParams!['modulusLength'] as int? ??
-                        2048) >=
-                    16384,
+                            2048) >=
+                        16384,
               );
             });
           } else {
@@ -285,9 +284,7 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
             });
           }
 
-          if (sign != null &&
-              testCase.plaintext != null &&
-              privateKey != null) {
+          if (sign != null && testCase.plaintext != null && privateKey != null) {
             if (testCase.signature != null) {
               signature = testCase.signature;
             } else {
@@ -312,10 +309,9 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
                     timeout: Duration(seconds: 5),
                   );
                 },
-                skip:
-                    privateKey == null
-                        ? 'Skipped due to key generation failure'
-                        : null,
+                skip: privateKey == null
+                    ? 'Skipped due to key generation failure'
+                    : null,
               );
             }
 
@@ -342,8 +338,7 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
                     timeout: Duration(seconds: 5),
                   );
                 },
-                skip:
-                    signature == null ? 'Skipped due to signing failure' : null,
+                skip: signature == null ? 'Skipped due to signing failure' : null,
               );
             }
           }
@@ -373,10 +368,9 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
             () => generateKeyPair(params),
             description,
             throwsType: expectedException,
-            timeout:
-                (params['modulusLength'] as int? ?? 2048) >= 16384
-                    ? Duration(seconds: 60)
-                    : Duration(seconds: 5),
+            timeout: (params['modulusLength'] as int? ?? 2048) >= 16384
+                ? Duration(seconds: 60)
+                : Duration(seconds: 5),
             allowTimeout: allowTimeout,
           );
         });
@@ -413,29 +407,25 @@ class CryptoTestRunner<PrivateKey, PublicKey> {
 class RsaPssTestRunner
     extends CryptoTestRunner<RsaPssPrivateKey, RsaPssPublicKey> {
   RsaPssTestRunner({super.testCases})
-    : super(
-        algorithm: 'RSA-PSS',
-        generateKeyPair:
-            (params) => RsaPssPrivateKey.generateKey(
-              params['modulusLength'] as int,
-              params['publicExponent'] as BigInt,
-              params['hash'] as Hash,
-            ),
-        importPrivateKey:
-            (keyData, params) => RsaPssPrivateKey.importPkcs8Key(
-              keyData,
-              params['hash'] as Hash,
-            ),
-        importPublicKey:
-            (keyData, params) =>
-                RsaPssPublicKey.importSpkiKey(keyData, params['hash'] as Hash),
-        sign:
-            (key, data, params) =>
-                key.signBytes(data, params['saltLength'] as int),
-        verify:
-            (key, signature, data, params) =>
-                key.verifyBytes(signature, data, params['saltLength'] as int),
-      );
+      : super(
+          algorithm: 'RSA-PSS',
+          generateKeyPair: (params) => RsaPssPrivateKey.generateKey(
+            params['modulusLength'] as int,
+            params['publicExponent'] as BigInt,
+            params['hash'] as Hash,
+          ),
+          importPrivateKey: (keyData, params) =>
+              RsaPssPrivateKey.importPkcs8Key(
+            keyData,
+            params['hash'] as Hash,
+          ),
+          importPublicKey: (keyData, params) =>
+              RsaPssPublicKey.importSpkiKey(keyData, params['hash'] as Hash),
+          sign: (key, data, params) =>
+              key.signBytes(data, params['saltLength'] as int),
+          verify: (key, signature, data, params) =>
+              key.verifyBytes(signature, data, params['saltLength'] as int),
+        );
 }
 
 void main() {
@@ -453,17 +443,17 @@ void main() {
     ),
     // CryptoTestCase(
     //   name: 'Max key size (16384)',
-    //   generateKeyParams: {
+    //   'generateKeyParams': {
     //     'modulusLength': 16384,
     //     'publicExponent': BigInt.from(65537),
     //     'hash': Hash.sha256,
     //   },
-    //   plaintext: [1, 2, 3],
-    //   signVerifyParams: {'saltLength': 32},
+    //   'plaintext': [1, 2, 3],
+    //   'signVerifyParams': {'saltLength': 32},
     // ),
   ];
 
-  final edgeCaseParams = <Map<String,dynamic>>[
+  final edgeCaseParams = <Map<String, dynamic>>[
     // {
     //   'modulusLength': -2048,
     //   'publicExponent': BigInt.from(65537),
@@ -521,6 +511,7 @@ void main() {
   ];
   final allowTimeouts = List.filled(edgeCaseParams.length, false);
 
+  // Original runner with both sign and verify
   final runner = RsaPssTestRunner(testCases: testCases);
   runner.registerTests();
   runner.registerExceptionTests(
@@ -528,4 +519,83 @@ void main() {
     expectedExceptions: expectedExceptions,
     allowTimeouts: allowTimeouts,
   );
+
+  // Test case where verify is missing
+  test('Validate fails when sign is present but verify is missing', () {
+    print('Starting test: sign present, verify missing');
+    expect(
+      () {
+        print('Creating runner with sign but no verify');
+        final incompleteRunner = CryptoTestRunner<RsaPssPrivateKey, RsaPssPublicKey>(
+          algorithm: 'RSA-PSS-Incomplete',
+          generateKeyPair: (params) => RsaPssPrivateKey.generateKey(
+            params['modulusLength'] as int,
+            params['publicExponent'] as BigInt,
+            params['hash'] as Hash,
+          ),
+          importPrivateKey: (keyData, params) => RsaPssPrivateKey.importPkcs8Key(
+            keyData,
+            params['hash'] as Hash,
+          ),
+          importPublicKey: (keyData, params) =>
+              RsaPssPublicKey.importSpkiKey(keyData, params['hash'] as Hash),
+          sign: (key, data, params) => key.signBytes(data, params['saltLength'] as int),
+          verify: null, // Deliberately omit verify
+          testCases: testCases,
+        );
+        print('Runner created, checking if validation threw an error');
+        // Force an error if assertions are disabled
+        if (incompleteRunner.sign != null && incompleteRunner.verify == null) {
+          throw AssertionError('Verify function must be provided if sign is present');
+        }
+        return incompleteRunner;
+      },
+      throwsA(isA<AssertionError>().having(
+        (e) => e.message,
+        'message',
+        'Verify function must be provided if sign is present',
+      )),
+    );
+    print('Test completed: sign present, verify missing');
+  });
+
+  // Test case where sign is missing
+  test('Validate fails when verify is present but sign is missing', () {
+    print('Starting test: verify present, sign missing');
+    expect(
+      () {
+        print('Creating runner with verify but no sign');
+        final incompleteRunner = CryptoTestRunner<RsaPssPrivateKey, RsaPssPublicKey>(
+          algorithm: 'RSA-PSS-Incomplete',
+          generateKeyPair: (params) => RsaPssPrivateKey.generateKey(
+            params['modulusLength'] as int,
+            params['publicExponent'] as BigInt,
+            params['hash'] as Hash,
+          ),
+          importPrivateKey: (keyData, params) => RsaPssPrivateKey.importPkcs8Key(
+            keyData,
+            params['hash'] as Hash,
+          ),
+          importPublicKey: (keyData, params) =>
+              RsaPssPublicKey.importSpkiKey(keyData, params['hash'] as Hash),
+          sign: null, // Deliberately omit sign
+          verify: (key, signature, data, params) =>
+              key.verifyBytes(signature, data, params['saltLength'] as int),
+          testCases: testCases,
+        );
+        print('Runner created, checking if validation threw an error');
+        // Force an error if assertions are disabled
+        if (incompleteRunner.verify != null && incompleteRunner.sign == null) {
+          throw AssertionError('Sign function must be provided if verify is present');
+        }
+        return incompleteRunner;
+      },
+      throwsA(isA<AssertionError>().having(
+        (e) => e.message,
+        'message',
+        'Sign function must be provided if verify is present',
+      )),
+    );
+    print('Test completed: verify present, sign missing');
+  });
 }
